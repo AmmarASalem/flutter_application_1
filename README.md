@@ -1,47 +1,16 @@
-# flutter_application_1
+# Jareed Stories Flutter App
 
-Minimal Flutter app that:
+Flutter app that lists and opens stories from the Jareed CAD API.
 
-- Fetches all Mailchimp campaigns
-- Fetches HTML content for each campaign
-- Sorts campaigns by date (newest first)
-- Shows campaign title/date buttons on the main screen
-- Opens a detail screen that renders campaign HTML when tapped
+## Run Locally
 
-## Run
-
-For local development, store secrets in a file at the project root named `secrets.dev.json` (this file is gitignored):
-
-```json
-{
-	"MAILCHIMP_API_KEY": "your_api_key-usX",
-	"MAILCHIMP_SERVER_PREFIX": "usX"
-}
-```
-
-You can copy from `secrets.dev.example.json`.
-
-Then run:
+From the project root:
 
 ```bash
-flutter run --dart-define-from-file=secrets.dev.json
+flutter pub get
+flutter run
 ```
 
-Alternative (less safe because it can leak into shell history):
+## Notes
 
-```bash
-flutter run \
-	--dart-define=MAILCHIMP_API_KEY=your_api_key-usX
-```
-
-Optional (only if server prefix cannot be inferred from your API key):
-
-```bash
-flutter run \
-	--dart-define=MAILCHIMP_API_KEY=your_api_key \
-	--dart-define=MAILCHIMP_SERVER_PREFIX=usX
-```
-
-## Security note
-
-For production, do not ship Mailchimp API keys inside the Flutter app. Put the key on a backend service and call that backend from the app.
+- If emoji characters render as square boxes on Linux/WSL, install a system emoji font.

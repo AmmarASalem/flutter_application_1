@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
-import 'package:emojis/emojis.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:webview_flutter/webview_flutter.dart';
@@ -341,7 +340,7 @@ class _CampaignsScreenState extends State<CampaignsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Jareed Stories ${Emojis.sparkles}'),
+        title: const Text('Jareed Stories'),
       ),
       body:
           _isInitialLoading
@@ -392,6 +391,7 @@ class _CampaignsScreenState extends State<CampaignsScreen> {
                             );
                           },
                           child: Row(
+                            textDirection: TextDirection.ltr,
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               Expanded(
@@ -408,7 +408,7 @@ class _CampaignsScreenState extends State<CampaignsScreen> {
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
-                                      '${Emojis.calendar} $dateLabel',
+                                      dateLabel,
                                       textDirection: TextDirection.ltr,
                                       textAlign: TextAlign.left,
                                     ),
@@ -416,17 +416,20 @@ class _CampaignsScreenState extends State<CampaignsScreen> {
                                 ),
                               ),
                               if (campaign.imageUrl != null) ...[
-                                const SizedBox(width: 12),
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(8),
-                                  child: Image.network(
-                                    campaign.imageUrl!,
-                                    width: 180,
-                                    height: 90,
-                                    fit: BoxFit.cover,
-                                    errorBuilder:
-                                        (context, error, stackTrace) =>
-                                            const SizedBox.shrink(),
+                                const SizedBox(width: 10),
+                                Padding(
+                                  padding: const EdgeInsets.only(right: 4),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: Image.network(
+                                      campaign.imageUrl!,
+                                      width: 176,
+                                      height: 90,
+                                      fit: BoxFit.cover,
+                                      errorBuilder:
+                                          (context, error, stackTrace) =>
+                                              const SizedBox.shrink(),
+                                    ),
                                   ),
                                 ),
                               ],
@@ -458,7 +461,7 @@ class _CampaignsScreenState extends State<CampaignsScreen> {
                                     strokeWidth: 2,
                                   ),
                                 )
-                                : Text('Load more stories ${Emojis.downArrow}'),
+                                : const Text('Load more stories'),
                       ),
                     ),
                 ],
@@ -511,9 +514,19 @@ class CampaignDetailScreen extends StatelessWidget {
           final supportsInAppWebView =
               Theme.of(context).platform == TargetPlatform.android ||
               Theme.of(context).platform == TargetPlatform.iOS;
+          final mediaUrl = campaign.imageUrl;
 
           if (supportsInAppWebView) {
-            return _CampaignWebView(html: result.html);
+            return Column(
+              children: [
+                if (mediaUrl != null) ...[
+                  const SizedBox(height: 12),
+                  _CampaignMediaPreview(imageUrl: mediaUrl),
+                  const SizedBox(height: 8),
+                ],
+                Expanded(child: _CampaignWebView(html: result.html)),
+              ],
+            );
           }
 
           // Desktop fallback while mobile uses full WebView rendering.
@@ -522,6 +535,10 @@ class CampaignDetailScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
+                if (mediaUrl != null) ...[
+                  _CampaignMediaPreview(imageUrl: mediaUrl),
+                  const SizedBox(height: 12),
+                ],
                 Html(
                   data: result.html,
                   style: {
@@ -534,23 +551,32 @@ class CampaignDetailScreen extends StatelessWidget {
                     ),
                   },
                 ),
-                if (result.fallbackText.isNotEmpty) ...[
-                  const SizedBox(height: 12),
-                  Text(
-                    'Desktop fallback text',
-                    textDirection: TextDirection.rtl,
-                  ),
-                  const SizedBox(height: 8),
-                  SelectableText(
-                    result.fallbackText,
-                    textDirection: TextDirection.rtl,
-                    textAlign: TextAlign.right,
-                  ),
-                ],
               ],
             ),
           );
         },
+      ),
+    );
+  }
+}
+
+class _CampaignMediaPreview extends StatelessWidget {
+  const _CampaignMediaPreview({required this.imageUrl});
+
+  final String imageUrl;
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.centerRight,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(10),
+        child: Image.network(
+          imageUrl,
+          fit: BoxFit.cover,
+          width: 360,
+          errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
+        ),
       ),
     );
   }
